@@ -6,6 +6,6 @@ import { emailSchema, OTPSchema } from "./validations";
 const OTPRouter: IRouter = Router();
 
 OTPRouter.post("/sentOTP",validateRequest(emailSchema), OTPController.sentOTP);
-OTPRouter.post("verifyOTP", validateRequest(OTPSchema), OTPController.verifyOTP);
+OTPRouter.post("/verifyOTP", validateRequest(OTPSchema), OTPController.verifyOTP);
 
 export default OTPRouter;

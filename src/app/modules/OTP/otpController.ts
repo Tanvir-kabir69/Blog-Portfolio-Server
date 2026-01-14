@@ -6,19 +6,29 @@ import { OTPService } from "./otpServices";
 
 const sentOTP = catchAsync(async (req: Request, res: Response) => {
   //
-  await OTPService.sentOTP(req.body);
+  const result = await OTPService.sentOTP(req?.body.email);
+  if (!result.success) {
+    sendResponse(res, {
+      success: false,
+      message: "OTP is not sent successfully",
+      statusCode: httpStatus.BAD_REQUEST,
+      data: result,
+    });
+
+    return;
+  }
 
   sendResponse(res, {
     success: true,
-    message: "OTP sent successfully",
+    message: "OTP is sent successfully",
     statusCode: httpStatus.OK,
-    data: null,
+    data: result,
   });
 });
 
 const verifyOTP = catchAsync(async (req: Request, res: Response) => {
   //
-  await OTPService.verifyOTP(req.body);
+  await OTPService.verifyOTP(req?.body);
 
   sendResponse(res, {
     success: true,
