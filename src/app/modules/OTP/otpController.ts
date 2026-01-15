@@ -28,7 +28,18 @@ const sentOTP = catchAsync(async (req: Request, res: Response) => {
 
 const verifyOTP = catchAsync(async (req: Request, res: Response) => {
   //
-  await OTPService.verifyOTP(req?.body);
+  const result = await OTPService.verifyOTP(req?.body);
+
+  if (!result.success) {
+    sendResponse(res, {
+      success: false,
+      message: "OTP is not verified successfully",
+      statusCode: httpStatus.BAD_REQUEST,
+      data: result,
+    });
+
+    return;
+  }
 
   sendResponse(res, {
     success: true,

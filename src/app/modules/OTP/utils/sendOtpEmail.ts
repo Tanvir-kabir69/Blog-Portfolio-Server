@@ -90,7 +90,7 @@ async function sendOtpEmail(
       <p style="font-size: 24px; font-weight: bold; letter-spacing: 4px;">${otp}</p>
       <p style="color: #666;">This code will expire in ${Math.floor(
         ttlSeconds / 60
-      )} minute(s).</p>
+      )} minutes.</p>
       <hr />
       <small>If you didn't request this, ignore this email.</small>
     </div>
