@@ -2,6 +2,7 @@ import { IRouter, Router } from "express";
 import userRouter from "../modules/user/userRouter";
 import blogRouter from "../modules/blog/blogRouter";
 import authRouter from "../modules/auth/authRouter";
+import OTPRouter from "../modules/OTP/otpRouter";
 
 interface ModuleRoute {
   path: string;
@@ -22,6 +23,10 @@ const moduleRoutes: ModuleRoute[] = [
   {
     path: "/auth",
     router: authRouter,
+  },
+  {
+    path: "/OTP",
+    router: OTPRouter,
   },
 ];
 
