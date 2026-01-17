@@ -3,6 +3,8 @@ import app from "./app";
 import dotenv from "dotenv";
 import { prisma } from "./app/config/db";
 import seedOwner from "./app/utils/seedOwner";
+import transporter from "./app/config/nodemailerConfig";
+import { connectToRedis } from "./app/config/redis.config";
 
 dotenv.config();
 
@@ -19,9 +21,28 @@ async function connectToDB() {
   }
 }
 
+const verifySMTP = () => {
+  return new Promise<void>((resolve) => {
+    transporter.verify((error) => {
+      if (error) {
+        console.error("❌ SMTP connection failed", error);
+      } else {
+        console.log("✅ SMTP server is ready to send emails");
+      }
+      resolve(); // IMPORTANT: never block server startup
+    });
+  });
+};
+
 async function startServer() {
   try {
     await connectToDB(); // ✅ wait for DB connection first
+    await connectToRedis(); // ✅ wait for Redis DB connection
+
+    // 🔐 Verify SMTP before server starts
+    // 🔐 Proper SMTP verification
+    await verifySMTP(); // ✅(await) 'SMTP failure' NOT to crash the server
+
     server = http.createServer(app);
     server.listen(process.env.PORT, async () => {
       console.log(`🚀 Server is running on port ${process.env.PORT}`);
