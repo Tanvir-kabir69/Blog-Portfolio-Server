@@ -1,5 +1,5 @@
 import { envVars } from "../config/env";
-import { AuthProvider, PrismaClient, Role } from "@prisma/client";
+import { AuthProvider, Prisma, PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
@@ -44,7 +44,15 @@ const seedOwner = async () => {
       }
     });
   } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2021"
+    ) {
+      console.warn("⚠️ Database not migrated yet. Skipping owner creation.");
+    }
+
     console.error("❌ Error creating Owner:", error);
+    throw error; // 🔥 Real errors
   } finally {
     await prisma.$disconnect();
   }
