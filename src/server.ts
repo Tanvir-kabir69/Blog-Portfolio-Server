@@ -23,7 +23,7 @@ async function connectToDB() {
 
 const verifySMTP = () => {
   return new Promise<void>((resolve) => {
-    transporter.verify((error) => {
+    transporter.verify((error: any) => {
       if (error) {
         console.error("❌ SMTP connection failed", error);
       } else {
