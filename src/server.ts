@@ -3,8 +3,8 @@ import app from "./app";
 import dotenv from "dotenv";
 import { prisma } from "./app/config/db";
 import seedOwner from "./app/utils/seedOwner";
-import { connectToRedis } from "./app/config/redis.config";
 import transporter from "./app/config/nodemailerConfig";
+import { connectToRedis } from "./app/config/redis.config";
 
 dotenv.config();
 
