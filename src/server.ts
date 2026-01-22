@@ -1,7 +1,7 @@
 import http, { Server } from "http";
 import app from "./app";
 import dotenv from "dotenv";
-import { prisma } from "./app/config/db";
+import { prisma } from "./app/lib/prisma";
 import seedOwner from "./app/utils/seedOwner";
 import transporter from "./app/config/nodemailerConfig";
 import { connectToRedis } from "./app/config/redis.config";
@@ -12,11 +12,21 @@ let server: Server | null = null;
 
 async function connectToDB() {
   try {
+    // 1. Initialize the internal logic
     await prisma.$connect();
-    console.log("✅ DB connection successfull!!");
+
+    // 2. Force a real network round-trip (The Pulse Query)
+    // This executes a simple 'SELECT 1' on the database
+    await prisma.$queryRaw`SELECT 1`;
+
+    console.log("✅ Real-time DB connection successful!!");
   } catch (error) {
-    console.log("🚫 DB connection failed!");
-    console.log(error);
+    const dbConnectionEessage: string =
+      "🚫 DB connection failed! No internet or invalid credentials.";
+    console.error(dbConnectionEessage);
+    // In Prisma 7, errors often have specific codes
+    console.error(error);
+    console.warn("🛑 Server did not start. Exiting process.");
     process.exit(1);
   }
 }
