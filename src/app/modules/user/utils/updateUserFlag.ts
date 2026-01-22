@@ -1,4 +1,4 @@
-import { prisma } from "../../../config/db";
+import { prisma } from "../../../lib/prisma";
 import AppError from "../../../utils/AppError";
 import httpStatus from "http-status-codes";
 

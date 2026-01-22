@@ -3,10 +3,10 @@ import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../config/env";
 import AppError from "./AppError";
 import { generateToken, verifyToken } from "./jwt";
-import { User } from "@prisma/client";
 import { AuthTokens } from "../interfaces/auhtTokens";
-import { prisma } from "../config/db";
 import { IJwtPayload } from "../interfaces/jwtPayload";
+import { User } from "../../generated/prisma/client";
+import { prisma } from "../lib/prisma";
 
 // export const createUserTokens = (user: Partial<User>): AuthTokens => {
 export const createUserTokens = (user: User): AuthTokens => {
@@ -20,13 +20,13 @@ export const createUserTokens = (user: User): AuthTokens => {
   const accessToken = generateToken(
     jwtPayload,
     envVars.JWT_ACCESS_SECRET,
-    envVars.JWT_ACCESS_EXPIRES
+    envVars.JWT_ACCESS_EXPIRES,
   );
 
   const refreshToken = generateToken(
     jwtPayload,
     envVars.JWT_REFRESH_SECRET,
-    envVars.JWT_REFRESH_EXPIRES
+    envVars.JWT_REFRESH_EXPIRES,
   );
 
   return {
@@ -36,12 +36,12 @@ export const createUserTokens = (user: User): AuthTokens => {
 };
 
 export const createNewAccessTokenByRefreshToken = async (
-  refreshToken: string
+  refreshToken: string,
 ): Promise<Partial<AuthTokens>> => {
   try {
     const verifiedRefreshToken = verifyToken(
       refreshToken,
-      envVars.JWT_REFRESH_SECRET
+      envVars.JWT_REFRESH_SECRET,
     ) as JwtPayload;
 
     const isUserExist = await prisma.user.findUnique({
@@ -54,7 +54,7 @@ export const createNewAccessTokenByRefreshToken = async (
     if (!isUserExist.password) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "Password not set for this account"
+        "Password not set for this account",
       );
     }
 
@@ -84,14 +84,14 @@ export const createNewAccessTokenByRefreshToken = async (
     const accessToken = generateToken(
       jwtPayload,
       envVars.JWT_ACCESS_SECRET,
-      envVars.JWT_ACCESS_EXPIRES
+      envVars.JWT_ACCESS_EXPIRES,
     );
 
     return { accessToken };
   } catch (err) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Something went wrong in generating new Access Token"
+      "Something went wrong in generating new Access Token",
     );
   }
 };

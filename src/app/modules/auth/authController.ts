@@ -4,7 +4,7 @@ import passport from "passport";
 import AppError from "../../utils/AppError";
 import httpStatus from "http-status-codes";
 import { sendResponse } from "../../utils/sendResponse";
-import { User } from "@prisma/client";
+import { User } from "../../../generated/prisma/client";
 import {
   createNewAccessTokenByRefreshToken,
   createUserTokens,
@@ -24,7 +24,7 @@ export const loginUser = catchAsync(
           if (err) {
             // system/db error from strategy
             return reject(
-              new AppError(httpStatus.INTERNAL_SERVER_ERROR, String(err))
+              new AppError(httpStatus.INTERNAL_SERVER_ERROR, String(err)),
             );
           }
 
@@ -33,8 +33,8 @@ export const loginUser = catchAsync(
             return reject(
               new AppError(
                 httpStatus.UNAUTHORIZED,
-                info?.message || "Invalid credentials"
-              )
+                info?.message || "Invalid credentials",
+              ),
             );
           }
 
@@ -58,10 +58,10 @@ export const loginUser = catchAsync(
           });
 
           return resolve();
-        }
+        },
       )(req, res, next);
     });
-  }
+  },
 );
 
 const newAccessToken = catchAsync(
@@ -80,7 +80,7 @@ const newAccessToken = catchAsync(
       message: "New Access Token Set successfully",
       data: null,
     });
-  }
+  },
 );
 
 const logOut = catchAsync(
@@ -93,7 +93,7 @@ const logOut = catchAsync(
       message: "Logout successful",
       data: null,
     });
-  }
+  },
 );
 
 export const authController = {
