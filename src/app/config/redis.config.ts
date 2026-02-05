@@ -10,6 +10,15 @@ export const redisClient: RedisClientType = createClient({
   },
 });
 
+// export const redisClient = createClient({
+//   url: envVars.REDIS.REDIS_URL,
+//   socket: {
+//     tls: true,
+//     servername: "redis-18108.c14.us-east-1-2.ec2.cloud.redislabs.com",
+//     rejectUnauthorized: true,
+//   },
+// });
+
 redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
 // await client.set('foo', 'bar');
