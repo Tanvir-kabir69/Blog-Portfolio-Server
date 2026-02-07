@@ -31,70 +31,172 @@ enum Gender {
 }
 
 model User {
-  id           Int          @id @unique @default(autoincrement())
-  email        String       @unique
-  password     String?
-  name         String?
-  address      String?
-  gender       Gender?
-  dob          DateTime?
-  role         Role         @default(USER)
-  image        String?
-  isActive     Boolean      @default(true)
-  isBlocked    Boolean      @default(false)
-  isDeleted    Boolean      @default(false)
-  isSubscribed Boolean      @default(false)
-  isVerified   Boolean      @default(false)
-  blogs        Blog[]
-  provider     AuthProvider
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt()
+  id             Int             @id @unique @default(autoincrement())
+  email          String          @unique
+  password       String?
+  name           String?
+  address        String?
+  gender         Gender?
+  dob            DateTime?
+  role           Role            @default(USER)
+  image          String?
+  isActive       Boolean         @default(true)
+  isBlocked      Boolean         @default(false)
+  isDeleted      Boolean         @default(false)
+  isSubscribed   Boolean         @default(false)
+  isVerified     Boolean         @default(false)
+  blogs          Blog[]
+  provider       AuthProvider
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt()
+  projectShares  ProjectShare[]
+  projectRatings ProjectRating[]
+  // projectReviews ProjectReview[]
+  featureRatings FeatureRating[]
 }
 
-model Blog {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  tags        String[] @default([])
-  image       String?
-  content     String?
-  slug        String
-  views       Int
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt()
+// PROJECT MODEL---------------------------------------------------------------------------------------------------------------------------------------------
+enum ProjectType {
+  FRONTEND
+  BACKEND
+  FULLSTACK
+  MOBILE
+  DEXTOPY
+  ANDROID
+  IOS
+  WEB
+  WINDOWS
+  MACOS
+  IPHONE
+  IPAD
+  DevOps
+  NETWORKING
+  DATABASE
+  AI
+  MACHINE_LEARNING
+  DATA_SCIENCE
+  CLOUD_COMPUTING
+  OTHER
 }
 
 model Project {
-  id           Int          @id @default(autoincrement())
-  title        String
-  description  String
-  tags         String[]     @default([])
-  liveUrl      String?
-  repoUrl      String?
-  images       String[]     @default([])
-  features     Feature[] // Relation to Feature table
-  technologies Technology[] // Relation to Technology table
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt()
+  id               Int             @id @default(autoincrement())
+  type             ProjectType
+  title            String
+  description      Json? // Point based description, can include rich text, links, etc. Normally short description will be displayed, but this will be displayed when see details is clicked. Also see less will make it collapse and show short description again.
+  shortDescription Json?
+  liveUrl          String?
+  repoUrl          String?
+  tags             String[]        @default([])
+  images           String[]        @default([])
+  rating           Float?          @default(0)
+  isPinned         Boolean         @default(false)
+  isArchived       Boolean         @default(false)
+  isDeleted        Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt()
+  features         Feature[] // Relation to Feature table
+  technologies     Technology[] // Relation to Technology table
+  // ratings          String[]       @default([])
+  // reviews          String[]       @default([])
+  projectRatings   ProjectRating[]
+  // projectReviews   ProjectReview[]
+  featureRatings   FeatureRating[]
+  projectShares    ProjectShare[]
 }
 
+// ***(This might be under consideration, if recruter is forced to log in that not a good sign. Also if the portfolio can not show details, it is useless.) No one will be able to see the project details unless they are logged in. If an unsigned user tries to see the project details, they will be prompted to sign up/login. Also there will be option to see all features and technologies in a paginated way, showing <x> features/technologies per page.
+// * a part/button will have appear to share the project as blog, so the project can be shared as blog. While a project is shared as blog, a blog will be created with the title, short description, description, features, technologies, tags and images(grid view).
+// also will be copy link option for project, so the project can be shared as link
+// Copy link will be successful if someone just copy it, But If someone who is not logged in tries to share it as Blog, he will be directed to the sign up/login page, and after successful login/signup, they will be redirected to the share as blog page, where they can share the project as blog. Also if someone who is logged in tries to share it as Blog, he will be directed to the share as blog page directly.
+
 model Feature {
-  id                Int     @id @default(autoincrement())
+  id                Int             @id @default(autoincrement())
   representingEmoji String
   featureName       String
   shortDescription  String? // Optional
+  description       String? // Optional. Project description like, this will be displayed when see details is clicked. Also see less will make it collapse and show short description again.
   tutorialDemo      String? // Optional
   projectId         Int
-  project           Project @relation(fields: [projectId], references: [id])
+  project           Project         @relation(fields: [projectId], references: [id])
+  featureRatings    FeatureRating[]
 }
+
+model FeatureRating {
+  id        Int      @id @default(autoincrement())
+  rating    Float    @default(0)
+  review    String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  featureId Int
+  projectId Int
+  project   Project  @relation(fields: [projectId], references: [id])
+  feature   Feature  @relation(fields: [featureId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+// where features will be displayed, there will be two tablike section, All and Yoy. All will be default showing top ratings + reviews, while you will show only the features you have rated/reviewed. Also there will be option to sort by rating, date, etc.
+// there will also be a section for giving rating + review for any user. User can give multiple ratings + reviews in a feature, mut not more than <x>. If an unsigned user tries to give rating + review, they will be prompted to sign up/login. Also there will be option to edit/delete their ratings + reviews. Also there will be option to see all ratings + reviews for a feature, which will show the ratings + reviews in a paginated way, showing <x> ratings + reviews per page.
 
 model Technology {
   id                Int     @id @default(autoincrement())
   representingEmoji String
   technologyName    String
   usage             String? // Optional
+  description       String? // Optional. Project description like, this will be displayed when see details is clicked. Also see less will make it collapse and show short description again.
   projectId         Int
   project           Project @relation(fields: [projectId], references: [id])
 }
+
+model ProjectRating {
+  id        Int      @id @default(autoincrement())
+  rating    Float    @default(0)
+  review    String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  projectId Int
+  project   Project  @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+// This is not necessary as review can be part of rating
+// model ProjectReview {
+//   id        Int      @id @default(autoincrement())
+//   review    String
+//   userId    Int
+//   user      User     @relation(fields: [userId], references: [id])
+//   projectId Int
+//   project   Project  @relation(fields: [projectId], references: [id])
+//   createdAt DateTime @default(now())
+// }
+
+model ProjectShare {
+  id             Int      @id @default(autoincrement())
+  projectId      Int
+  project        Project  @relation(fields: [projectId], references: [id])
+  sharedProjecrl String   @unique // Unique URL for sharing the project
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id])
+  blogId         Int? // Optional relation to Blog if shared as a blog
+  blog           Blog?    @relation(fields: [blogId], references: [id])
+  createdAt      DateTime @default(now())
+}
+
+// BLOG MODEL---------------------------------------------------------------------------------------------------------------------------------------------
+model Blog {
+  id            Int            @id @default(autoincrement())
+  title         String
+  description   String
+  tags          String[]       @default([])
+  image         String?
+  content       String?
+  slug          String
+  views         Int
+  userId        Int
+  user          User           @relation(fields: [userId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt()
+  projectShares ProjectShare[]
+}
+
+// * A Project can be shared as Blog
