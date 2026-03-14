@@ -97,11 +97,7 @@ model Project {
   updatedAt        DateTime        @updatedAt()
   features         Feature[] // Relation to Feature table
   technologies     Technology[] // Relation to Technology table
-  // ratings          String[]       @default([])
-  // reviews          String[]       @default([])
   projectRatings   ProjectRating[]
-  // projectReviews   ProjectReview[]
-  featureRatings   FeatureRating[]
   projectShares    ProjectShare[]
 }
 
@@ -114,8 +110,8 @@ model Feature {
   id                Int             @id @default(autoincrement())
   representingEmoji String
   featureName       String
-  shortDescription  String? // Optional
-  description       String? // Optional. Project description like, this will be displayed when see details is clicked. Also see less will make it collapse and show short description again.
+  shortDescription  Json? // Optional
+  description       Json? // Optional. Project description like, this will be displayed when see details is clicked. Also see less will make it collapse and show short description again.
   tutorialDemo      String? // Optional
   projectId         Int
   project           Project         @relation(fields: [projectId], references: [id])
@@ -129,8 +125,6 @@ model FeatureRating {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   featureId Int
-  projectId Int
-  project   Project  @relation(fields: [projectId], references: [id])
   feature   Feature  @relation(fields: [featureId], references: [id])
   createdAt DateTime @default(now())
 }
@@ -142,8 +136,8 @@ model Technology {
   id                Int     @id @default(autoincrement())
   representingEmoji String
   technologyName    String
-  usage             String? // Optional
-  description       String? // Optional. Project description like, this will be displayed when see details is clicked. Also see less will make it collapse and show short description again.
+  usage             Json? // Optional
+  description       Json? // Optional. Project description like, this will be displayed when see details is clicked. Also see less will make it collapse and show short description again.
   projectId         Int
   project           Project @relation(fields: [projectId], references: [id])
 }
@@ -158,17 +152,6 @@ model ProjectRating {
   project   Project  @relation(fields: [projectId], references: [id])
   createdAt DateTime @default(now())
 }
-
-// This is not necessary as review can be part of rating
-// model ProjectReview {
-//   id        Int      @id @default(autoincrement())
-//   review    String
-//   userId    Int
-//   user      User     @relation(fields: [userId], references: [id])
-//   projectId Int
-//   project   Project  @relation(fields: [projectId], references: [id])
-//   createdAt DateTime @default(now())
-// }
 
 model ProjectShare {
   id             Int      @id @default(autoincrement())
@@ -189,9 +172,9 @@ model Blog {
   description   String
   tags          String[]       @default([])
   image         String?
-  content       String?
-  slug          String
-  views         Int
+  content       Json? // Optional for rich text, links, etc.
+  slug          String?
+  views         Int            @default(0)
   userId        Int
   user          User           @relation(fields: [userId], references: [id])
   createdAt     DateTime       @default(now())
