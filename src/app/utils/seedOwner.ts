@@ -1,8 +1,11 @@
 import { envVars } from "../config/env";
-import { AuthProvider, Prisma, PrismaClient, Role } from "@prisma/client";
+// import { AuthProvider, Prisma, PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { AuthProvider, Role } from "../../generated/prisma/enums";
+import { prisma } from "../lib/prisma";
+import { Prisma } from "../../generated/prisma/client";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 const seedOwner = async () => {
   try {
@@ -23,7 +26,7 @@ const seedOwner = async () => {
     // Hash password
     const hashedPassword = await bcrypt.hash(
       envVars.OWNER_PASSWORD,
-      Number(envVars.BCRYPT_SALT_ROUND)
+      Number(envVars.BCRYPT_SALT_ROUND),
     );
 
     await prisma.$transaction(async (tx) => {

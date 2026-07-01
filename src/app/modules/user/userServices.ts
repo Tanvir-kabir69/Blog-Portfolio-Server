@@ -1,18 +1,18 @@
-import { Prisma, User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { envVars } from "../../config/env";
-import { prisma } from "../../config/db";
 import AppError from "../../utils/AppError";
 import httpStatus from "http-status-codes";
 import { TMeta } from "../../interfaces/meta";
 import updateUserFlag, { UpdateFlag } from "./utils/updateUserFlag";
+import { prisma } from "../../lib/prisma";
+import { Prisma, User } from "../../../generated/prisma/client";
 
 const createUserIntoDB = async (
-  payload: Prisma.UserCreateInput
+  payload: Prisma.UserCreateInput,
 ): Promise<User> => {
   const hashedPassword = await bcrypt.hash(
     payload.password as string,
-    Number(envVars.BCRYPT_SALT_ROUND)
+    Number(envVars.BCRYPT_SALT_ROUND),
   );
   const hashedUserData: Prisma.UserCreateInput = {
     ...payload,
@@ -28,7 +28,7 @@ const getAllUsersFromDB = async (
   page: number,
   limit: number,
   orderOn: string,
-  orderBy: string
+  orderBy: string,
 ): Promise<{ data: Partial<User>[]; meta?: TMeta }> => {
   const skip = (page - 1) * limit;
   console.log(search, ",", page, ",", limit);
@@ -80,7 +80,7 @@ const getAllUsersFromDB = async (
   if (!result) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Something Went wrong, try again"
+      "Something Went wrong, try again",
     );
   }
 
@@ -117,7 +117,7 @@ const getASingleUserFromDB = async (id: number) => {
 
 const updateASingleUserIntoDB = async (
   id: number,
-  payload: Prisma.UserUpdateInput
+  payload: Prisma.UserUpdateInput,
 ) => {
   const updatedUser = await prisma.user.update({
     where: { id },
@@ -161,7 +161,7 @@ const updateASingleUserIntoDB = async (
 const updateUserFlagService = async (
   id: number,
   field: UpdateFlag,
-  value: boolean
+  value: boolean,
 ) => {
   const updatedUser = await prisma.user.update({
     where: { id },
@@ -176,7 +176,7 @@ const updateUserFlagService = async (
   if (!updatedUser) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `Failed to update user '${field}' status as: ${value}`
+      `Failed to update user '${field}' status as: ${value}`,
     );
   }
 

@@ -4,7 +4,7 @@ import httpStatus from "http-status-codes";
 import { envVars } from "../config/env";
 import AppError from "../utils/AppError";
 import { verifyToken } from "../utils/jwt";
-import { prisma } from "../config/db";
+import { prisma } from "../lib/prisma";
 import { IJwtPayload } from "../interfaces/jwtPayload";
 
 export const checkAuth =
