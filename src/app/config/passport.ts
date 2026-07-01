@@ -9,7 +9,7 @@ import {
 import { Strategy as LocalStrategy } from "passport-local";
 import { envVars } from "./env";
 import { prisma } from "./db";
-import { AuthProvider } from "@prisma/client";
+import { AuthProvider } from "../../generated/prisma/enums";
 
 passport.use(
   new LocalStrategy(

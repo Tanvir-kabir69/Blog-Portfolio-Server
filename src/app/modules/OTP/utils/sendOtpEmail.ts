@@ -2,6 +2,9 @@
 import { RedisClientType } from "redis"; // node-redis v4 typing
 import transporter from "../../../config/nodemailerConfig";
 import { SendOtpResult } from "../interfaces/sendOtpEmail";
+import OtpEmailPurpose from "../interfaces/otpEmailPurpose";
+import generateOtpEmail from "./otpEmailTemplate";
+import generateOtpEmailSubject from "./generateOtpEmailSubject";
 // ---------------------------------------------------------------
 // Utility: generate numeric OTP of given length (default 6)
 function generateOtp(length = 6): string {
@@ -19,7 +22,11 @@ function generateOtp(length = 6): string {
 // - opts: optional behaviour controls (otpLength, ttlSeconds, rateLimit, cooldownSeconds)
 async function sendOtpEmail(
   redisClient: RedisClientType,
-  email: string,
+  userData: {
+    email: string,
+    name?: string,
+  },
+  purpose: OtpEmailPurpose,
   opts?: {
     otpLength?: number;
     ttlSeconds?: number; // OTP validity
@@ -36,7 +43,7 @@ async function sendOtpEmail(
   } = opts ?? {};
 
   // keys (use email normalized as key)
-  const keyPrefix = `otp:${email.toLowerCase()}`;
+  const keyPrefix = `otp:${userData.email.toLowerCase()}`;
   const otpKey = `${keyPrefix}:code`; // stores the otp value
   const countKey = `${keyPrefix}:count`; // counts requests in 60s window
   const cooldownKey = `${keyPrefix}:cooldown`; // short cooldown between sends
@@ -78,23 +85,10 @@ async function sendOtpEmail(
     otp = generateOtp(otpLength);
   }
 
-  // 4) Prepare the email content (plain + HTML)
-  const subject = "Your verification code";
-  const text = `Your OTP code is: ${otp}. It will expire in ${Math.floor(
-    ttlSeconds / 60
-  )} minutes.`;
-  const html = `
-    <div style="font-family: Arial, sans-serif; line-height:1.4;">
-      <h3>Verification code</h3>
-      <p>Your OTP code is:</p>
-      <p style="font-size: 24px; font-weight: bold; letter-spacing: 4px;">${otp}</p>
-      <p style="color: #666;">This code will expire in ${Math.floor(
-        ttlSeconds / 60
-      )} minutes.</p>
-      <hr />
-      <small>If you didn't request this, ignore this email.</small>
-    </div>
-  `;
+  // 4) Prepare the email content (subject + HTML) using template helpers
+  const expiryMinutes = Math.floor(ttlSeconds / 60);
+  const subject = generateOtpEmailSubject(purpose);
+  const html = generateOtpEmail(otp, expiryMinutes, purpose, userData.name);
 
   // 5) Send the email using nodemailer
   try {
@@ -102,9 +96,9 @@ async function sendOtpEmail(
       // from: `"Your App" <no-reply@yourdomain.com>`, // change to your from
       // from: `"Blog Portfolio" <no-reply@tanvirkabir890.com>`, // change to your from
       from: `"Blog Portfolio"`, // change to your from
-      to: email,
+      to: userData.email,
       subject,
-      text,
+      // text,
       html,
     });
   } catch (sendErr) {
