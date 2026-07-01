@@ -8,7 +8,7 @@ import {
 } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
 import { envVars } from "./env";
-import { prisma } from "../lib/prisma";
+import { prisma } from "./db";
 import { AuthProvider } from "../../generated/prisma/enums";
 
 passport.use(

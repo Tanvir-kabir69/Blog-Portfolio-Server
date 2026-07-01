@@ -2,11 +2,15 @@ import { redisClient } from "../../config/redis.config";
 import sendOtpEmail from "./utils/sendOtpEmail";
 import verifyOtp from "./utils/verifyOtp";
 import { VerifyOtpPayload } from "./validations";
+import OtpEmailPurpose from "./interfaces/otpEmailPurpose";
 
 // const sentOTP = async (email: Record<string, string>) => {
 const sentOTP = async (email: string) => {
-  // console.log(email)
-  const result = await sendOtpEmail(redisClient, email);
+  const result = await sendOtpEmail(
+    redisClient,
+    { email },
+    OtpEmailPurpose.VERIFICATION,
+  );
   return result;
 };
 
