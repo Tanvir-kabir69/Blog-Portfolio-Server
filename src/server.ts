@@ -31,18 +31,26 @@ async function connectToDB() {
   }
 }
 
-const verifySMTP = () => {
-  return new Promise<void>((resolve) => {
-    transporter.verify((error: any) => {
-      if (error) {
-        console.error("❌ SMTP connection failed", error);
-      } else {
-        console.log("✅ SMTP server is ready to send emails");
-      }
-      resolve(); // IMPORTANT: never block server startup
+async function verifySMTP() {
+  try {
+    // Force Nodemailer to check the connection and wait for it
+    await new Promise<void>((resolve, reject) => {
+      transporter.verify((error) => {
+        if (error) {
+          return reject(error); // Triggers the catch block below
+        }
+        resolve();
+      });
     });
-  });
-};
+
+    console.log("✅ SMTP server is ready to send emails");
+  } catch (error) {
+    console.error("🚫 SMTP connection failed! Invalid credentials or network issue.");
+    console.error(error);
+    console.warn("🛑 Server did not start. Exiting process.");
+    process.exit(1); // Matches the strict crash-on-failure behavior of connectToDB
+  }
+}
 
 async function startServer() {
   try {
