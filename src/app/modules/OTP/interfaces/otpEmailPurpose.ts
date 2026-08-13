@@ -1,18 +1,12 @@
 enum OtpEmailPurpose {
-  VERIFICATION = "email verification",
-  SIGNUP = "signup",
-  RESET_PASSWORD = "reset password",
-  LOGIN = "login",
-  OTHER = "other",
-
   // OTP_TYPE mapping (email purpose)
-  ACCOUNT_REGISTER = "account registration",
   SIGN_UP = "sign up",
   SIGN_IN = "sign in",
 
   SETUP_2FA = "2FA setup",
   LOGIN_2FA = "2FA login",
   PASSWORDLESS_LOGIN = "passwordless login",
+  SETUP_PASSWORDLESS_LOGIN = "setup passwordless login",
 
   PASSWORD_FORGET = "password recovery",
   PASSWORD_RESET = "password reset",
@@ -22,15 +16,16 @@ enum OtpEmailPurpose {
   PHONE_VERIFY = "phone verification",
   DEVICE_VERIFY = "device verification",
 
-  SECURITY_SETTINGS = "security settings",
   DEACTIVATE_ACCOUNT = "account deactivation",
   REACTIVATE_ACCOUNT = "account reactivation",
   DELETE_ACCOUNT = "account deletion",
-
+  
   TRANSACTION = "transaction",
-
+  
+  SECURITY_SETTINGS = "security settings",
   API_SECURITY = "API security",
   ADMIN_ACTIONS = "admin actions",
+  OTHER = "other",
 }
 
 export default OtpEmailPurpose;
